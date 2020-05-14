@@ -11,8 +11,10 @@ export async function getRequestparameters() {
   page.on('request', interceptedRequest => {
     if (interceptedRequest.url().endsWith('.png') ||
       interceptedRequest.url().endsWith('.jpg') ||
+      interceptedRequest.url().endsWith('.gif') ||
       interceptedRequest.url().endsWith('.ico') ||
       interceptedRequest.url().endsWith('.svg') ||
+      interceptedRequest.url().endsWith('.ttf') ||
       interceptedRequest.url().endsWith('.woff') ||
       interceptedRequest.url().endsWith('.woff2')) {
       interceptedRequest.abort();
@@ -21,10 +23,11 @@ export async function getRequestparameters() {
       interceptedRequest.continue();
     }
   });
+  page.setDefaultTimeout(3 * 60 * 1000);
 
   console.info("connecting...");
-  await page.goto('https://www.cathaypacific.com/cx/zh_TW/book-a-trip/redeem-flights/facade.html?switch=Y')
-  await page.waitForSelector('body');
+  await page.goto('https://www.cathaypacific.com/cx/zh_TW/book-a-trip/redeem-flights/facade.html?switch=Y',
+    { waitUntil: 'load'});
 
   console.info("logging in...");
   await page.type('#membership-id', process.env.AM_ID);
@@ -52,7 +55,7 @@ export async function getRequestparameters() {
     let interceptor = async request => {
       //TODO: The url is sometimes 'https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/upsell?TAB_ID='
       if (!request.url().startsWith('https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/availability?TAB_ID=')) return;
-      console.debug("find some request matching the url pattern...");
+      console.debug("found a request matching the url pattern...");
       page.removeListener('request', interceptor);
       let cookie = await page.cookies()
         .then(cookies => cookies.reduce((accumulator, currentValue) =>
@@ -62,10 +65,14 @@ export async function getRequestparameters() {
       let body = request.postData();
       let headers = request.headers();
       res({ cookie, body, headers });
-      //setTimeout(() => browser.close());
+      setTimeout(() => browser.close());
     }
     page.on('request', interceptor);
-    await page.click('.date-card.available.ng-scope:last-child');
+    await page.evaluate(() => {
+      //The button is smoetimes covered by a modal, which makes the clicking ineffectual.
+      //Run a script that invokes its click method instead.
+      document.querySelector('.date-card.available.ng-scope:last-child').click();
+    });
     console.debug("request submitted...");
   });
 }

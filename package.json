@@ -1,14 +1,16 @@
 {
-  "name": "new-folder",
+  "name": "iredeem-updater",
   "version": "1.0.0",
   "description": "",
-  "main": "test.js",
+  "main": "updater.js",
   "dependencies": {
     "dotenv": "^8.2.0",
     "node-fetch": "^2.6.0",
     "puppeteer": "^3.0.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^26.0.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
