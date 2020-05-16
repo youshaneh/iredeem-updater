@@ -1,5 +1,6 @@
 node_modules/
 scratch/
-scratch2/
+test_data/
 info/
+error_log/*
 .env

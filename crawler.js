@@ -4,30 +4,35 @@ import fs from 'fs';
 
 export async function getRequestparameters() {
   const browser = await puppeteer.launch({
-    headless: false
+    headless: process.env.NODE_ENV != 'dev'
   });
   const page = await browser.newPage();
-  await page.setRequestInterception(true);
-  page.on('request', interceptedRequest => {
-    if (interceptedRequest.url().endsWith('.png') ||
-      interceptedRequest.url().endsWith('.jpg') ||
-      interceptedRequest.url().endsWith('.gif') ||
-      interceptedRequest.url().endsWith('.ico') ||
-      interceptedRequest.url().endsWith('.svg') ||
-      interceptedRequest.url().endsWith('.ttf') ||
-      interceptedRequest.url().endsWith('.woff') ||
-      interceptedRequest.url().endsWith('.woff2')) {
-      interceptedRequest.abort();
-    }
-    else {
-      interceptedRequest.continue();
-    }
-  });
   page.setDefaultTimeout(3 * 60 * 1000);
+  if (process.env.NODE_ENV == 'dev') {
+    await page.setViewport({ width: 1100, height: 800 })
+  }
+  else {
+    await page.setRequestInterception(true);
+    page.on('request', interceptedRequest => {
+      if (interceptedRequest.url().endsWith('.png') ||
+        interceptedRequest.url().endsWith('.jpg') ||
+        interceptedRequest.url().endsWith('.gif') ||
+        interceptedRequest.url().endsWith('.ico') ||
+        interceptedRequest.url().endsWith('.svg') ||
+        interceptedRequest.url().endsWith('.ttf') ||
+        interceptedRequest.url().endsWith('.woff') ||
+        interceptedRequest.url().endsWith('.woff2')) {
+        interceptedRequest.abort();
+      }
+      else {
+        interceptedRequest.continue();
+      }
+    });
+  }
 
   console.info("connecting...");
   await page.goto('https://www.cathaypacific.com/cx/zh_TW/book-a-trip/redeem-flights/facade.html?switch=Y',
-    { waitUntil: 'load'});
+    { waitUntil: 'load' });
 
   console.info("logging in...");
   await page.type('#membership-id', process.env.AM_ID);
@@ -38,7 +43,9 @@ export async function getRequestparameters() {
   console.info("filling in the fields...");
   await page.click('#tab-tripType-ow');
   await page.waitFor(100);
-  await page.type('[aria-controls="react-autowhatever-segments[0].destination"]', 'NRT');
+  await page.click('[aria-controls="react-autowhatever-segments[0].destination"]');
+  await page.waitFor(100);
+  await page.type('[aria-controls="react-autowhatever-segments[0].destination"]', 'YYZ');
   await page.waitFor(100);
   await page.click('[data-suggestion-index="0"]');
   await page.waitFor(100);
@@ -51,7 +58,7 @@ export async function getRequestparameters() {
   await page.waitForSelector('.date-card.available.ng-scope:last-child');
 
   console.info("getting the request template...");
-  return new Promise(async res => {
+  return new Promise(async resolve => {
     let interceptor = async request => {
       //TODO: The url is sometimes 'https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/upsell?TAB_ID='
       if (!request.url().startsWith('https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/availability?TAB_ID=')) return;
@@ -61,11 +68,11 @@ export async function getRequestparameters() {
         .then(cookies => cookies.reduce((accumulator, currentValue) =>
           `${accumulator}${currentValue.name}=${currentValue.value}; `, ''))
         .then(cookie => cookie.substring(0, cookie.length - 2));
-      console.debug("got cookie successfully...");
       let body = request.postData();
       let headers = request.headers();
-      res({ cookie, body, headers });
-      setTimeout(() => browser.close());
+      resolve({ cookie, body, headers });
+      // TODO: reuse the browser page to get new post body and
+      // cookies when current ones expire 
     }
     page.on('request', interceptor);
     await page.evaluate(() => {
@@ -73,13 +80,17 @@ export async function getRequestparameters() {
       //Run a script that invokes its click method instead.
       document.querySelector('.date-card.available.ng-scope:last-child').click();
     });
-    console.debug("request submitted...");
   });
 }
 
-//TODO: change from, to, and date fields in POST body
+//sample arguments: getFlights('HKG', 'YYZ', '201006040000', getRequestparameters())
 export async function getFlights(from, to, date, sampleParams) {
-  fetch("https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/availability", {
+  let body = sampleParams.body;
+  body = body.replace(/(^|&)B_LOCATION_1=[A-Z]{3}($|&)/, `$1B_LOCATION_1=${from}$2`);
+  body = body.replace(/(^|&)E_LOCATION_1=[A-Z]{3}($|&)/, `$1E_LOCATION_1=${to}$2`);
+  body = body.replace(/(^|&)(B_DATE_1=|WDS_DATE=)[0-9]{12}($|&)/g,
+    ($0, $1, $2, $3) => $1 + $2 + date + $3);
+  return fetch("https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/availability", {
     "headers": {
       "accept": "application/json, text/plain, */*",
       "accept-language": "en-US,en;q=0.9",
@@ -94,15 +105,62 @@ export async function getFlights(from, to, date, sampleParams) {
     },
     "referrer": "https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/availability",
     "referrerPolicy": "no-referrer-when-downgrade",
-    "body": sampleParams.body,
+    "body": body,
     "method": "POST",
     "mode": "cors"
   })
     .then(response => response.json())
     .then(responseJson => {
-      console.log(JSON.parse(responseJson.pageBom).modelObject
-        .availabilities.upsell.bounds[0].flights);
-      fs.writeFileSync('flights.json', responseJson.pageBom);
+      let pageBom = JSON.parse(responseJson.pageBom);
+      let flights = pageBom?.modelObject?.availabilities?.upsell?.bounds[0]?.flights;
+      if (!flights) {
+        fs.writeFileSync(`error_log/no_flights/response.json`, JSON.stringify(responseJson))
+      }
+      return flights;
     })
-    .catch(e => console.error(e));
+    .catch(e => {
+      console.error(e);
+    });
+}
+
+// Rules:
+// CX/KA[L] = L
+// CX/KA[L] + CX/KA[L] = L
+// CX/KA[L] + other[1-9] = N
+// other[L] = N
+// other[L] + other[L] = N
+// ---
+// Cabins:
+// R: ECO, economy
+// N: PEY, premium economy
+// B: BUS, business
+// F: FIR, first
+
+export async function updateDB(receivedItineraries, iRedeemRepository) {
+  let itineraries = [];
+  receivedItineraries.forEach(receivedItinerary => {
+    let itinerary = [];
+    receivedItinerary.segments.forEach(receivedFlight => {
+      let airline = receivedFlight.flightIdentifier.marketingAirline;
+      let flight_number = receivedFlight.flightIdentifier.flightNumber;
+      let aircraft = receivedFlight.equipment;
+      let status_f = receivedFlight.cabins.F?.status || 'X';
+      let status_b = receivedFlight.cabins.B?.status || 'X';
+      let status_r = receivedFlight.cabins.R?.status || 'X';
+      let status_n = receivedFlight.cabins.N?.status || 'X';
+      let [departure_terminal, departure_airport] = receivedFlight.originLocation.split('_');
+      let departure_time = receivedFlight.flightIdentifier.originDate;
+      let [arrival_terminal, arrival_airport] = receivedFlight.destinationLocation.split('_');
+      let arrival_time = receivedFlight.destinationDate;
+      let flight = {
+        airline, flight_number, aircraft,
+        status_f, status_b, status_r, status_n,
+        departure_airport, departure_terminal, departure_time,
+        arrival_airport, arrival_terminal, arrival_time
+      };
+      itinerary.push(flight);
+    });
+    itineraries.push(itinerary);
+  });
+  await iRedeemRepository.updateInterval(undefined, undefined, undefined, undefined, itineraries);
 }
