@@ -61,16 +61,28 @@ export async function getRequestparameters() {
   return new Promise(async resolve => {
     let interceptor = async request => {
       //TODO: The url is sometimes 'https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/upsell?TAB_ID='
-      if (!request.url().startsWith('https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/availability?TAB_ID=')) return;
-      console.debug("found a request matching the url pattern...");
-      page.removeListener('request', interceptor);
-      let cookie = await page.cookies()
-        .then(cookies => cookies.reduce((accumulator, currentValue) =>
-          `${accumulator}${currentValue.name}=${currentValue.value}; `, ''))
-        .then(cookie => cookie.substring(0, cookie.length - 2));
-      let body = request.postData();
-      let headers = request.headers();
-      resolve({ cookie, body, headers });
+      if (request.url().startsWith('https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/upsell?TAB_ID=')) {
+        console.debug("found a request to upsell...!!!");
+        page.removeListener('request', interceptor);
+        let cookie = await page.cookies()
+          .then(cookies => cookies.reduce((accumulator, currentValue) =>
+            `${accumulator}${currentValue.name}=${currentValue.value}; `, ''))
+          .then(cookie => cookie.substring(0, cookie.length - 2));
+        let body = request.postData();
+        let headers = request.headers();
+        fs.writeFileSync('error_log/upsell.json', JSON.stringify({ cookie, body, headers }));
+      }
+      if (request.url().startsWith('https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/availability?TAB_ID=')) {
+        console.debug("found a request matching the url pattern...");
+        page.removeListener('request', interceptor);
+        let cookie = await page.cookies()
+          .then(cookies => cookies.reduce((accumulator, currentValue) =>
+            `${accumulator}${currentValue.name}=${currentValue.value}; `, ''))
+          .then(cookie => cookie.substring(0, cookie.length - 2));
+        let body = request.postData();
+        let headers = request.headers();
+        resolve({ cookie, body, headers });
+      }
       // TODO: reuse the browser page to get new post body and
       // cookies when current ones expire 
     }
@@ -112,14 +124,14 @@ export async function getFlights(from, to, date, sampleParams) {
     .then(response => response.json())
     .then(responseJson => {
       let pageBom = JSON.parse(responseJson.pageBom);
-      let flights = pageBom?.modelObject?.availabilities?.upsell?.bounds[0]?.flights;
-      if (!flights) {
-        fs.writeFileSync(`error_log/no_flights/response.json`, JSON.stringify(responseJson))
+      if (pageBom?.modelObject?.isContainingErrors) {
+        console.error(`fail to get flight ${from}_${to}_${date}: ${pageBom.modelObject.messages?.text}`);
       }
+      let flights = pageBom?.modelObject?.availabilities?.upsell?.bounds[0]?.flights;
       return flights;
     })
     .catch(e => {
-      console.error(e);
+      throw e;
     });
 }
 
@@ -149,9 +161,11 @@ export async function updateDB(receivedItineraries, iRedeemRepository) {
       let status_r = receivedFlight.cabins.R?.status || 'X';
       let status_n = receivedFlight.cabins.N?.status || 'X';
       let [departure_terminal, departure_airport] = receivedFlight.originLocation.split('_');
-      let departure_time = receivedFlight.flightIdentifier.originDate;
+      let departure_time = new Date(receivedFlight.flightIdentifier.originDate)
+        .toISOString().slice(0, 19).replace('T', ' ');
       let [arrival_terminal, arrival_airport] = receivedFlight.destinationLocation.split('_');
-      let arrival_time = receivedFlight.destinationDate;
+      let arrival_time = new Date(receivedFlight.destinationDate)
+        .toISOString().slice(0, 19).replace('T', ' ');
       let flight = {
         airline, flight_number, aircraft,
         status_f, status_b, status_r, status_n,

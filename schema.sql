@@ -33,10 +33,10 @@ CREATE TABLE `flight` (
   `status_n` char(2) NOT NULL,
   `departure_airport` char(3) NOT NULL,
   `departure_terminal` char(2) NOT NULL,
-  `departure_time` timestamp NOT NULL,
+  `departure_time` datetime NOT NULL,
   `arrival_airport` char(3) NOT NULL,
   `arrival_terminal` char(2) NOT NULL,
-  `arrival_time` timestamp NOT NULL,
+  `arrival_time` datetime NOT NULL,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_index` (`airline`,`flight_number`,`departure_time`)
@@ -89,4 +89,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-05-16 23:07:42
+-- Dump completed on 2020-05-17 21:28:55

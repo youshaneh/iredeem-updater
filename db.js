@@ -16,8 +16,8 @@ class IRedeemRepository {
         departure_airport, departure_terminal, departure_time,
         arrival_airport, arrival_terminal, arrival_time)
         VALUES(?,?,?,?,?,?,?,
-          ?,?,FROM_UNIXTIME(SUBSTRING(?, 1, 10)),
-          ?,?,FROM_UNIXTIME(SUBSTRING(?, 1, 10)));`,
+          ?,?,?,
+          ?,?,?);`,
         [airline, flight_number, aircraft,
           status_f, status_b, status_r, status_n,
           departure_airport, departure_terminal, departure_time,
@@ -95,7 +95,7 @@ class IRedeemRepository {
       this.connection.query(`UPDATE flight SET
         status_f = ?, status_b = ?, status_r = ?, status_n = ?
         WHERE airline = ? AND flight_number = ?
-        AND departure_time = FROM_UNIXTIME(SUBSTRING(?, 1, 10));`,
+        AND departure_time = ?;`,
         [status_f, status_b, status_r, status_n,
           airline, flight_number, departure_time],
         (error, result) => {
@@ -114,7 +114,7 @@ class IRedeemRepository {
     return new Promise((resolve, reject) => {
       this.connection.query(`SELECT * from flight
         where airline = ? AND flight_number = ? AND
-        departure_time = FROM_UNIXTIME(SUBSTRING(?, 1, 10))`,
+        departure_time = ?`,
         [airline, flight_number, departure_time],
         (error, result) => {
           if (error) {

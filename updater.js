@@ -5,7 +5,7 @@ import { getIRedeemRepository } from './db.js';
 
 dotenv.config();
 (async () => {
-  let [iRedeemRepository, sampleParams] = await Promise.all(getIRedeemRepository(), getRequestparameters());
+  let [iRedeemRepository, sampleParams] = await Promise.all([getIRedeemRepository(), getRequestparameters()]);
 
   if (process.env.NODE_ENV == 'dev') fs.writeFileSync(
     'test_data/sampleParams.json', JSON.stringify(sampleParams));
@@ -13,8 +13,9 @@ dotenv.config();
   // let sampleParams = JSON.parse(fs.readFileSync('test_data/sampleParams.json', 'utf-8'));
 
   let testData = [
-    ['OKA', 'YVR', '202008070000', sampleParams],
-    ['OKA', 'YVR', '202008080000', sampleParams]];
+    ['HKG', 'YYZ', '202008070000', sampleParams],
+    ['HKG', 'YYZ', '202008080000', sampleParams],
+    ['HKG', 'YYZ', '202008090000', sampleParams]];
   for (let i = 0; i < testData.length; i++) {
     let testDataDir;
     if (process.env.NODE_ENV == 'dev') {
@@ -28,9 +29,9 @@ dotenv.config();
       fs.writeFileSync(`${testDataDir}/allFlights.json`, JSON.stringify(flights));
     }
 
-    updateDB(flights, iRedeemRepository);
-
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    await Promise.all(
+      [updateDB(flights, iRedeemRepository),
+      new Promise(resolve => setTimeout(resolve, 2000))]);
   }
   //TODO: remove redundant recoreds in flight table at the end
 
