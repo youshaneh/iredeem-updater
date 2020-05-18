@@ -13,9 +13,9 @@ dotenv.config();
   // let sampleParams = JSON.parse(fs.readFileSync('test_data/sampleParams.json', 'utf-8'));
 
   let testData = [
-    ['HKG', 'YYZ', '202008070000', sampleParams],
-    ['HKG', 'YYZ', '202008080000', sampleParams],
-    ['HKG', 'YYZ', '202008090000', sampleParams]];
+    ['HKG', 'YYZ', '2020-08-07', sampleParams],
+    ['HKG', 'YYZ', '2020-08-08', sampleParams],
+    ['HKG', 'YYZ', '2020-08-09', sampleParams]];
   for (let i = 0; i < testData.length; i++) {
     let testDataDir;
     if (process.env.NODE_ENV == 'dev') {
@@ -30,10 +30,10 @@ dotenv.config();
     }
 
     await Promise.all(
-      [updateDB(flights, iRedeemRepository),
-      new Promise(resolve => setTimeout(resolve, 2000))]);
+      [updateDB(testData[i][0], testData[i][1], testData[i][2], flights, iRedeemRepository),
+      new Promise(resolve => setTimeout(resolve, 1000))]);
   }
-  //TODO: remove redundant recoreds in flight table at the end
+  //TODO: remove redundant recoreds in DB at the end
 
   iRedeemRepository.end();
 })();

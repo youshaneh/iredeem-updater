@@ -41,16 +41,13 @@ class IRedeemRepository {
       (currentStatus.status_n != lastStatus.status_n);
   }
 
-  async updateInterval(startDepartureTime, endDepartureTime, from, to, itineraries) {
+  async updateInterval(from, to, date, itineraries) {
     this.connection.beginTransaction(function (err) {
       if (err) { throw err; }
     });
-    // TODO: delete all itineraries from ${from} to ${to} the
-    // departureTime of which is between startDepartureTime and endDepartureTime
     try {
-      for (let i = 0; i < itineraries.length ; i++) {
-        await this.addItinerary(itineraries[i]);
-      }
+      await this.removeItineraries(from, to, date);
+      await this.addItinerarys(itineraries);
     }
     catch (e) {
       this.connection.rollback(() => { throw e });
@@ -58,6 +55,33 @@ class IRedeemRepository {
     this.connection.commit(function (err) {
       if (err) return connection.rollback(() => { throw err });
     });
+  }
+
+  async removeItineraries(from, to, date) {
+    return new Promise((resolve, reject) => {
+      this.connection.query(`DELETE itinerary FROM itinerary
+          JOIN flight AS f1 ON itinerary.flight1 = f1.id
+          LEFT JOIN flight AS f2 ON itinerary.flight2 = f2.id
+        WHERE f1.departure_airport = ?
+          AND IFNULL(f2.arrival_airport, f1.arrival_airport) = ?
+          AND DATE(f1.departure_time) = ?;`,
+        [from, to, date],
+        (error, result) => {
+          if (error) {
+            reject(error);
+          }
+          else {
+            resolve(result);
+          }
+        }
+      );
+    })
+  }
+
+  async addItinerarys(itineraries) {
+    for (let i = 0; i < itineraries.length; i++) {
+      await this.addItinerary(itineraries[i]);
+    }
   }
 
   async addItinerary([flight1, flight2]) {

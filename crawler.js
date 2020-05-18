@@ -95,8 +95,8 @@ export async function getRequestparameters() {
   });
 }
 
-//sample arguments: getFlights('HKG', 'YYZ', '201006040000', getRequestparameters())
 export async function getFlights(from, to, date, sampleParams) {
+  date = date.replace(/-/g, '').concat('0000');
   let body = sampleParams.body;
   body = body.replace(/(^|&)B_LOCATION_1=[A-Z]{3}($|&)/, `$1B_LOCATION_1=${from}$2`);
   body = body.replace(/(^|&)E_LOCATION_1=[A-Z]{3}($|&)/, `$1E_LOCATION_1=${to}$2`);
@@ -148,7 +148,7 @@ export async function getFlights(from, to, date, sampleParams) {
 // B: BUS, business
 // F: FIR, first
 
-export async function updateDB(receivedItineraries, iRedeemRepository) {
+export async function updateDB(from, to, date, receivedItineraries, iRedeemRepository) {
   let itineraries = [];
   receivedItineraries.forEach(receivedItinerary => {
     let itinerary = [];
@@ -176,5 +176,5 @@ export async function updateDB(receivedItineraries, iRedeemRepository) {
     });
     itineraries.push(itinerary);
   });
-  await iRedeemRepository.updateInterval(undefined, undefined, undefined, undefined, itineraries);
+  await iRedeemRepository.updateInterval(from, to, date, itineraries);
 }
