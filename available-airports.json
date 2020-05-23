@@ -1,0 +1,452 @@
+[
+  [
+    "Adelaide",
+    "Adelaide International Airport",
+    "ADL",
+    "Australia"
+  ],
+  [
+    "Auckland",
+    "Auckland International Airport",
+    "AKL",
+    "New Zealand"
+  ],
+  [
+    "Amsterdam",
+    "Amsterdam Schiphol Airport",
+    "AMS",
+    "Netherlands"
+  ],
+  [
+    "Bahrain",
+    "Bahrain International Airport",
+    "BAH",
+    "Bahrain"
+  ],
+  [
+    "Barcelona",
+    "Barcelona Airport",
+    "BCN",
+    "Spain"
+  ],
+  [
+    "Bangkok",
+    "Suvarnabhumi International Airport",
+    "BKK",
+    "Thailand"
+  ],
+  [
+    "Brisbane",
+    "Brisbane International Airport",
+    "BNE",
+    "Australia"
+  ],
+  [
+    "Mumbai",
+    "Chhatrapati Shivaji International Airport",
+    "BOM",
+    "India"
+  ],
+  [
+    "Boston",
+    "Logan International Airport",
+    "BOS",
+    "United States"
+  ],
+  [
+    "Brussels",
+    "Brussels Airport",
+    "BRU",
+    "Belgium"
+  ],
+  [
+    "Bandar Seri Begawan",
+    "Bandar Seri Begawan International Airport",
+    "BWN",
+    "Brunei"
+  ],
+  [
+    "Paris",
+    "Charles De Gaulle Airport",
+    "CDG",
+    "France"
+  ],
+  [
+    "Cebu",
+    "Mactan-Cebu International Airport",
+    "CEB",
+    "Philippines"
+  ],
+  [
+    "Jakarta",
+    "Soekarno-Hatta International Airport",
+    "CGK",
+    "Indonesia"
+  ],
+  [
+    "Christchurch",
+    "Christchurch International Airport",
+    "CHC",
+    "New Zealand"
+  ],
+  [
+    "Jeju",
+    "Jeju International Airport",
+    "CJU",
+    "Korea"
+  ],
+  [
+    "Colombo",
+    "Bandaranaike International Airport",
+    "CMB",
+    "Sri Lanka"
+  ],
+  [
+    "Copenhagen (Kastrup)",
+    "Airport",
+    "CPH",
+    "Denmark"
+  ],
+  [
+    "Cape Town",
+    "Cape Town International Airport",
+    "CPT",
+    "South Africa"
+  ],
+  [
+    "Sapporo",
+    "New Chitose Airport",
+    "CTS",
+    "Japan"
+  ],
+  [
+    "Nha-trang",
+    "Cam Ranh Int'l Airport",
+    "CXR",
+    "Vietnam"
+  ],
+  [
+    "Delhi",
+    "Indira Gandhi International Airport",
+    "DEL",
+    "India"
+  ],
+  [
+    "Denpasar (bali)",
+    "Ngurah Rai International Airport",
+    "DPS",
+    "Indonesia"
+  ],
+  [
+    "Dublin",
+    "Dublin Airport",
+    "DUB",
+    "Ireland"
+  ],
+  [
+    "Davao",
+    "Davao City Francisco Bangoy International Airport",
+    "DVO",
+    "Philippines"
+  ],
+  [
+    "Dubai",
+    "Dubai International Airport",
+    "DXB",
+    "United Arab Emirates"
+  ],
+  [
+    "New York",
+    "Newark Liberty International Airport",
+    "EWR",
+    "United States"
+  ],
+  [
+    "Rome",
+    "Leonardo Da Vinci International (Fiumicino) Airport",
+    "FCO",
+    "Italy"
+  ],
+  [
+    "Frankfurt",
+    "Frankfurt International Airport",
+    "FRA",
+    "Germany"
+  ],
+  [
+    "Fukuoka",
+    "Fukuoka Airport",
+    "FUK",
+    "Japan"
+  ],
+  [
+    "Tokyo",
+    "Haneda Airport",
+    "HND",
+    "Japan"
+  ],
+  [
+    "Hyderabad",
+    "Rajiv Gandhi International Airport",
+    "HYD",
+    "India"
+  ],
+  [
+    "Washington Dc",
+    "Washington Dulles International Airport",
+    "IAD",
+    "United States"
+  ],
+  [
+    "Seoul",
+    "Incheon International Airport",
+    "ICN",
+    "Korea"
+  ],
+  [
+    "New York",
+    "John F. Kennedy International Airport",
+    "JFK",
+    "United States"
+  ],
+  [
+    "Johannesburg",
+    "Oliver Reginald Tambo International Airport",
+    "JNB",
+    "South Africa"
+  ],
+  [
+    "Khabarovsk",
+    "Khabarovsk Novy Airport",
+    "KHV",
+    "Russia"
+  ],
+  [
+    "Niigata",
+    "Niigata",
+    "KIJ",
+    "Japan"
+  ],
+  [
+    "Osaka",
+    "Kansai International Airport",
+    "KIX",
+    "Japan"
+  ],
+  [
+    "Komatsu",
+    "Komatsu Airport",
+    "KMQ",
+    "Japan"
+  ],
+  [
+    "Los Angeles",
+    "Los Angeles International Airport",
+    "LAX",
+    "United States"
+  ],
+  [
+    "London",
+    "Gatwick",
+    "LGW",
+    "United Kingdom"
+  ],
+  [
+    "London",
+    "Heathrow Airport",
+    "LHR",
+    "United Kingdom"
+  ],
+  [
+    "Chennai",
+    "Chennai International Airport",
+    "MAA",
+    "India"
+  ],
+  [
+    "Madrid",
+    "Madrid-Barajas Airport",
+    "MAD",
+    "Spain"
+  ],
+  [
+    "Manchester",
+    "Manchester Airport",
+    "MAN",
+    "United Kingdom"
+  ],
+  [
+    "Mandalay",
+    "Mandalay/ Annisaton",
+    "MDL",
+    "Myanmar"
+  ],
+  [
+    "Melbourne",
+    "Melbourne Airport",
+    "MEL",
+    "Australia"
+  ],
+  [
+    "Malé",
+    "Ibrahim Nasir International Airport",
+    "MLE",
+    "Maldives"
+  ],
+  [
+    "Manila",
+    "Ninoy Aquino International Airport",
+    "MNL",
+    "Philippines"
+  ],
+  [
+    "Munich",
+    "Munich Franz Josef Strauss International Airport",
+    "MUC",
+    "Germany"
+  ],
+  [
+    "Milan",
+    "Milan Malpensa Airport",
+    "MXP",
+    "Italy"
+  ],
+  [
+    "Nairobi",
+    "Jomo Kenyatta Int'l",
+    "NBO",
+    "Kenya"
+  ],
+  [
+    "Nagoya",
+    "Chubu Centrair International Airport",
+    "NGO",
+    "Japan"
+  ],
+  [
+    "Tokyo",
+    "Narita International Airport",
+    "NRT",
+    "Japan"
+  ],
+  [
+    "Chicago",
+    "Chicago O'Hare International Airport",
+    "ORD",
+    "United States"
+  ],
+  [
+    "Beijing",
+    "Beijing Capital International Airport",
+    "PEK",
+    "Mainland China"
+  ],
+  [
+    "Perth",
+    "Perth International Airport",
+    "PER",
+    "Australia"
+  ],
+  [
+    "Shanghai",
+    "Shanghai Pudong International Airport",
+    "PVG",
+    "Mainland China"
+  ],
+  [
+    "Seattle",
+    "Seattle-Tacoma International Airport",
+    "SEA",
+    "United States"
+  ],
+  [
+    "San Francisco",
+    "San Francisco International Airport",
+    "SFO",
+    "United States"
+  ],
+  [
+    "Ho Chi Minh City",
+    "Tan Son Nhat International Airport",
+    "SGN",
+    "Vietnam"
+  ],
+  [
+    "Singapore",
+    "Changi Airport",
+    "SIN",
+    "Singapore"
+  ],
+  [
+    "Shijiazhuang",
+    "Shijiazhuang",
+    "SJW",
+    "Mainland China"
+  ],
+  [
+    "Surabaya",
+    "Juanda International Airport",
+    "SUB",
+    "Indonesia"
+  ],
+  [
+    "Sydney",
+    "Sydney (Kingsford Smith) Airport",
+    "SYD",
+    "Australia"
+  ],
+  [
+    "Tokushima",
+    "Tokushima Airport",
+    "TKS",
+    "Japan"
+  ],
+  [
+    "Tel Aviv",
+    "Ben Gurion",
+    "TLV",
+    "Israel"
+  ],
+  [
+    "Taipei",
+    "Taoyuan International Airport",
+    "TPE",
+    "Taiwan China"
+  ],
+  [
+    "Tianjin",
+    "Tianjin Binhai International Airport",
+    "TSN",
+    "Mainland China"
+  ],
+  [
+    "Utapao",
+    "Rayong/ Utapao",
+    "UTP",
+    "Thailand"
+  ],
+  [
+    "Ulan-ude",
+    "Ulan-Ude Airport",
+    "UUD",
+    "Russia"
+  ],
+  [
+    "Vancouver",
+    "Vancouver International Airport",
+    "YVR",
+    "Canada"
+  ],
+  [
+    "Toronto",
+    "Toronto Lester B. Pearson International Airport",
+    "YYZ",
+    "Canada"
+  ],
+  [
+    "Zurich",
+    "Zurich Airport",
+    "ZRH",
+    "Switzerland"
+  ]
+]

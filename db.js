@@ -62,10 +62,13 @@ class IRedeemRepository {
       this.connection.query(`DELETE itinerary FROM itinerary
           JOIN flight AS f1 ON itinerary.flight1 = f1.id
           LEFT JOIN flight AS f2 ON itinerary.flight2 = f2.id
-        WHERE f1.departure_airport = ?
-          AND IFNULL(f2.arrival_airport, f1.arrival_airport) = ?
-          AND DATE(f1.departure_time) = ?;`,
-        [from, to, date],
+        WHERE
+          f1.departure_airport = ?
+          AND ((f1.arrival_airport = ? AND f2.departure_airport IS NULL)
+          OR f2.arrival_airport = ?)
+          AND f1.departure_time >= ?
+          AND f1.departure_time < DATE_ADD(?, INTERVAL 1 DAY);`,
+        [from, to, to, date, date],
         (error, result) => {
           if (error) {
             reject(error);
@@ -156,23 +159,30 @@ class IRedeemRepository {
   }
 }
 
-export function getIRedeemRepository() {
-  let connection = mysql.createConnection({
-    host: 'localhost',
-    port: 3306,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: 'iredeem'
-  });
-  return new Promise((resolve, reject) => {
-    connection.connect(err => {
-      if (err) {
-        reject(err);
-      }
-      else {
-        console.info('connected to database');
-        resolve(connection);
-      }
+export async function getIRedeemRepository(retry = 5) {
+  try {
+    let connection = mysql.createConnection({
+      host: 'localhost',
+      port: 3306,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: 'iredeem'
     });
-  }).then(connection => new IRedeemRepository(connection));
+    return await new Promise((resolve, reject) => {
+      connection.connect(e => {
+        if (e) {
+          reject(e);
+        }
+        else {
+          console.info('connected to database');
+          resolve(new IRedeemRepository(connection));
+        }
+      });
+    });
+  }
+  catch (e) {
+    if (retry < 0) throw e;
+    console.error(e);
+    return await getIRedeemRepository(retry - 1);
+  }
 }
