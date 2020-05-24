@@ -16,7 +16,7 @@ let lastRoute;
       let today = new Date();
       for (let route of routes) {
         for (let { from, to } of [{ from: route[0], to: route[1] }, { from: route[1], to: route[0] }]) {
-          for (let i = 56; i <= 60; i++) {
+          for (let i = 3; i <= 60; i++) {
             let date = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
             if (resume) {
               if (from != lastRoute.from || to != lastRoute.to || date < lastRoute.date) continue;
@@ -33,11 +33,11 @@ let lastRoute;
               await getRequestParameters();
               flights = await getFlights(from, to, date);
             }
-            if (process.env.NODE_ENV == 'dev') {
+            //if (process.env.NODE_ENV == 'dev') {
               let testDataDir = `test_data/`;
               if (process.env.NODE_ENV == 'dev' && !fs.existsSync(testDataDir)) fs.mkdirSync(testDataDir);
               fs.writeFileSync(`${testDataDir}/${from}_${to}_${date}_flights.json`, JSON.stringify(flights));
-            }
+            //}
             await updateDB(from, to, date, flights, iRedeemRepository);
             await new Promise(resolve => setTimeout(resolve, 1000));
           }
