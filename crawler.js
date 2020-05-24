@@ -149,6 +149,7 @@ export async function getFlights(from, to, date) {
     "method": "POST",
     "mode": "cors"
   });
+  console.log('got response');
   let responseText = await response.text();
   let responseJson;
   try {

@@ -5,7 +5,7 @@ import { getIRedeemRepository } from './db.js';
 
 dotenv.config();
 let airports = JSON.parse(fs.readFileSync('available-airports.json', 'utf-8'));
-let catchUp = '';
+let catchUp = '';  //TODO: continue from where we left off
 (async function update(){
   try{
     let [iRedeemRepository] = await Promise.all([
@@ -28,7 +28,7 @@ let catchUp = '';
           let date = new Date(today.getTime() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
           let flights;
           try {
-            flights = await getFlights(from, to, date);
+            flights = await getFlights(from, to, date); //TODO: get return trip flights
           }
           catch (e) {
             if(e.message != 'Request quota is used up') console.error(e);

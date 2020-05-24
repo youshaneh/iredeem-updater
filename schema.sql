@@ -29,17 +29,20 @@ CREATE TABLE `flight` (
   `aircraft` char(3) NOT NULL,
   `status_f` char(2) NOT NULL,
   `status_b` char(2) NOT NULL,
-  `status_r` char(2) NOT NULL,
   `status_n` char(2) NOT NULL,
+  `status_r` char(2) NOT NULL,
   `departure_airport` char(3) NOT NULL,
-  `departure_terminal` char(2) NOT NULL,
+  `departure_terminal` char(3) NOT NULL,
   `departure_time` datetime NOT NULL,
   `arrival_airport` char(3) NOT NULL,
-  `arrival_terminal` char(2) NOT NULL,
+  `arrival_terminal` char(3) NOT NULL,
   `arrival_time` datetime NOT NULL,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_index` (`airline`,`flight_number`,`departure_time`)
+  UNIQUE KEY `unique_index` (`airline`,`flight_number`,`departure_time`),
+  KEY `departure_airport` (`departure_airport`),
+  KEY `arrival_airport` (`arrival_airport`),
+  KEY `departure_time` (`departure_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -50,6 +53,37 @@ CREATE TABLE `flight` (
 LOCK TABLES `flight` WRITE;
 /*!40000 ALTER TABLE `flight` DISABLE KEYS */;
 /*!40000 ALTER TABLE `flight` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `history`
+--
+
+DROP TABLE IF EXISTS `history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `history` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `flight_id` int unsigned NOT NULL,
+  `status_f` char(2) NOT NULL,
+  `status_b` char(2) NOT NULL,
+  `status_n` char(2) NOT NULL,
+  `status_r` char(2) NOT NULL,
+  `update_time` timestamp NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `flight_id` (`flight_id`),
+  KEY `update_time` (`update_time`),
+  CONSTRAINT `history_ibfk_1` FOREIGN KEY (`flight_id`) REFERENCES `flight` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `history`
+--
+
+LOCK TABLES `history` WRITE;
+/*!40000 ALTER TABLE `history` DISABLE KEYS */;
+/*!40000 ALTER TABLE `history` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -89,4 +123,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-05-17 21:28:55
+-- Dump completed on 2020-05-24 13:04:16

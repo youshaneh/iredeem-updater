@@ -5,23 +5,44 @@ class IRedeemRepository {
     this.connection = connection;
   }
 
-  async addFlight({ airline, flight_number, aircraft,
-    status_f, status_b, status_r, status_n,
+  addFlight({ airline, flight_number, aircraft,
+    status_f, status_b, status_n, status_r,
     departure_airport, departure_terminal, departure_time,
     arrival_airport, arrival_terminal, arrival_time }) {
     return new Promise((resolve, reject) => {
       this.connection.query(`INSERT INTO flight(
         airline, flight_number, aircraft,
-        status_f, status_b, status_r, status_n,
+        status_f, status_b, status_n, status_r,
         departure_airport, departure_terminal, departure_time,
         arrival_airport, arrival_terminal, arrival_time)
         VALUES(?,?,?,?,?,?,?,
           ?,?,?,
           ?,?,?);`,
         [airline, flight_number, aircraft,
-          status_f, status_b, status_r, status_n,
+          status_f, status_b, status_n, status_r,
           departure_airport, departure_terminal, departure_time,
           arrival_airport, arrival_terminal, arrival_time],
+        (error, result) => {
+          if (error) {
+            reject(error);
+          }
+          else {
+            resolve(result);
+          }
+        }
+      );
+    });
+  }
+
+  addHistory({ id: flight_id, update_time,
+    status_f, status_b, status_n, status_r }) {
+    return new Promise((resolve, reject) => {
+      this.connection.query(`INSERT INTO history(
+        flight_id, update_time,
+        status_f, status_b, status_n, status_r)
+        VALUES(?,?,?,?,?,?);`,
+        [flight_id, update_time,
+          status_f, status_b, status_n, status_r],
         (error, result) => {
           if (error) {
             reject(error);
@@ -37,8 +58,8 @@ class IRedeemRepository {
   isStatusChanged(currentStatus, lastStatus) {
     return (currentStatus.status_f != lastStatus.status_f) ||
       (currentStatus.status_b != lastStatus.status_b) ||
-      (currentStatus.status_r != lastStatus.status_r) ||
-      (currentStatus.status_n != lastStatus.status_n);
+      (currentStatus.status_n != lastStatus.status_n) ||
+      (currentStatus.status_r != lastStatus.status_r);
   }
 
   async updateInterval(from, to, date, itineraries) {
@@ -57,7 +78,7 @@ class IRedeemRepository {
     });
   }
 
-  async removeItineraries(from, to, date) {
+  removeItineraries(from, to, date) {
     return new Promise((resolve, reject) => {
       this.connection.query(`DELETE itinerary FROM itinerary
           JOIN flight AS f1 ON itinerary.flight1 = f1.id
@@ -110,20 +131,21 @@ class IRedeemRepository {
     if (!storedFlight) {
       return this.addFlight(flight).then(flight => flight.insertId);
     }
-    else if (this.isStatusChanged(flight, storedFlight)) {
+    else {
+      if (this.isStatusChanged(flight, storedFlight)) await this.addHistory(storedFlight);
       await this.updateFlightStatus(flight);
     }
     return storedFlight.id;
   }
 
-  async updateFlightStatus({ airline, flight_number, departure_time,
-    status_f, status_b, status_r, status_n }) {
+  updateFlightStatus({ airline, flight_number, departure_time,
+    status_f, status_b, status_n, status_r }) {
     return new Promise((resolve, reject) => {
       this.connection.query(`UPDATE flight SET
-        status_f = ?, status_b = ?, status_r = ?, status_n = ?
+        status_f = ?, status_b = ?, status_n = ?, status_r = ?
         WHERE airline = ? AND flight_number = ?
         AND departure_time = ?;`,
-        [status_f, status_b, status_r, status_n,
+        [status_f, status_b, status_n, status_r,
           airline, flight_number, departure_time],
         (error, result) => {
           if (error) {
@@ -137,7 +159,7 @@ class IRedeemRepository {
     });
   }
 
-  async getFlight({ airline, flight_number, departure_time }) {
+  getFlight({ airline, flight_number, departure_time }) {
     return new Promise((resolve, reject) => {
       this.connection.query(`SELECT * from flight
         where airline = ? AND flight_number = ? AND
