@@ -33,11 +33,11 @@ let lastRoute;
               await getRequestParameters();
               flights = await getFlights(from, to, date);
             }
-            //if (process.env.NODE_ENV == 'dev') {
+            if (process.env.NODE_ENV == 'dev') {
               let testDataDir = `test_data/`;
               if (process.env.NODE_ENV == 'dev' && !fs.existsSync(testDataDir)) fs.mkdirSync(testDataDir);
               fs.writeFileSync(`${testDataDir}/${from}_${to}_${date}_flights.json`, JSON.stringify(flights));
-            //}
+            }
             await updateDB(from, to, date, flights, iRedeemRepository);
             await new Promise(resolve => setTimeout(resolve, 1000));
           }
