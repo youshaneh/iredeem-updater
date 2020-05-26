@@ -1,6 +1,6 @@
 import fs from 'fs';
 import dotenv from 'dotenv';
-import { updateDB, initBrowserPage, getRequestParameters, setupAndGetRequestParameters, getFlights } from './crawler.js';
+import { updateDB, initBrowserPage, getRequestParameters, setupAndGetRequestParameters, getFlights } from './crawler-am.js';
 import { getIRedeemRepository } from './db.js';
 
 dotenv.config();
@@ -35,11 +35,11 @@ let lastRoute;
             }
             if (process.env.NODE_ENV == 'dev') {
               let testDataDir = `test_data/`;
-              if (process.env.NODE_ENV == 'dev' && !fs.existsSync(testDataDir)) fs.mkdirSync(testDataDir);
+              if (!fs.existsSync(testDataDir)) fs.mkdirSync(testDataDir);
               fs.writeFileSync(`${testDataDir}/${from}_${to}_${date}_flights.json`, JSON.stringify(flights));
             }
             await updateDB(from, to, date, flights, iRedeemRepository);
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 3000));
           }
         }
       }

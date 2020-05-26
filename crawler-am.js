@@ -11,6 +11,7 @@ export async function initBrowserPage(retry = 5) {
   try {
     if (browser) await browser.close();
     browser = await puppeteer.launch({
+      //executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
       headless: process.env.NODE_ENV != 'dev'
     });
 
@@ -35,18 +36,26 @@ export async function initBrowserPage(retry = 5) {
       });
     }
 
-    await page.goto('https://www.cathaypacific.com/cx/zh_TW/book-a-trip/redeem-flights/facade.html?switch=Y',
+    await page.goto('https://www.asiamiles.com/zh/redeem-awards/flight-awards/facade.html?recent_search=ow',
       { waitUntil: 'load' });
-    await page.type('#membership-id', process.env.AM_ID);
     await page.waitFor(500);
-    await page.type('#password', process.env.AM_PASSWORD);
+    await page.type('.main-wrapper [name="username"]', process.env.AM_ID);
     await page.waitFor(500);
-    await page.click('[type=submit][data-tealium-event=MEMBER]');
-    await page.waitForSelector('#tab-tripType-ow');
+    await page.type('.main-wrapper [name="password"]', process.env.AM_PASSWORD);
+    await page.waitFor(500);
+    await page.click('.main-wrapper .center-single-button.login-submit [type="submit"]');
+    try {
+      await page.waitForSelector('#tab-tripType-ow');
+    }
+    catch (e) {
+      await page.goto('https://www.asiamiles.com/zh/redeem-awards/flight-awards/facade.html?recent_search=ow',
+        { waitUntil: 'load' });
+    }
   }
   catch (e) {
     if (retry < 0) throw e;
     console.error(e);
+    await new Promise(resolve => setTimeout(resolve, 3000));
     await initBrowserPage(retry - 1);
   }
 }
@@ -65,8 +74,6 @@ export async function setupAndGetRequestParameters(retry = 5, nthAttempt = 0) {
 
 async function fillInBlanks(nthAttempt) {
   console.log('filling in blanks #' + nthAttempt + ' attempt');
-  await page.click('#tab-tripType-ow');
-  await page.waitFor(500);
   await page.click('[aria-controls="react-autowhatever-segments[0].destination"]');
   await page.waitFor(500);
   await page.type('[aria-controls="react-autowhatever-segments[0].destination"]', 'NRT');
@@ -98,7 +105,7 @@ export async function getRequestParameters() {
 
   sampleReqParams = await new Promise(async resolve => {
     let interceptor = async request => {
-      if (request.url().startsWith('https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/availability?TAB_ID=')) {
+      if (request.url().startsWith('https://book.asiamiles.com/CathayPacificAwardV3/dyn/air/booking/availability?TAB_ID=')) {
         page.removeListener('request', interceptor);
         let cookie = await page.cookies()
           .then(cookies => cookies.reduce((accumulator, currentValue) =>
@@ -107,7 +114,7 @@ export async function getRequestParameters() {
         let body = request.postData();
         let headers = request.headers();
         console.log("got a request template...");
-
+        await page.waitFor(1000);
         await page.waitForSelector('.btn-modify-itinerary');
         await page.evaluate(() => {
           document.querySelector('.flight-details-btn-wrap .btn-modify-itinerary').click();
@@ -136,10 +143,11 @@ export async function getFlights(from, to, date) {
   body = body.replace(/(^|&)(B_DATE_1=|WDS_DATE=)[0-9]{12}($|&)/g,
     ($0, $1, $2, $3) => $1 + $2 + date + $3);
   console.log(`fetching ${from}_${to}_${date}`);
-  let response = await fetch("https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/availability", {
+
+  let response = await fetch("https://book.asiamiles.com/CathayPacificAwardV3/dyn/air/booking/availability", {
     "headers": {
       "accept": "application/json, text/plain, */*",
-      "accept-language": "en-US,en;q=0.9",
+      "accept-language": "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6",
       "cache-control": "no-cache",
       "content-type": "application/x-www-form-urlencoded",
       "pragma": "no-cache",
@@ -149,7 +157,7 @@ export async function getFlights(from, to, date) {
       "x-distil-ajax": sampleReqParams.headers['x-distil-ajax'],
       "cookie": sampleReqParams.cookie
     },
-    "referrer": "https://book.cathaypacific.com/CathayPacificAwardV3/dyn/air/booking/availability",
+    "referrer": "https://book.asiamiles.com/CathayPacificAwardV3/dyn/air/booking/availability",
     "referrerPolicy": "no-referrer-when-downgrade",
     "body": body,
     "method": "POST",
@@ -159,6 +167,7 @@ export async function getFlights(from, to, date) {
     fs.writeFileSync(`error_log/${from}_${to}_${date}_response.json`, JSON.stringify(response));
     throw new Error(response.statusText)
   }
+  console.log(response);
   let responseText = await response.text();
   let responseJson;
   try {
