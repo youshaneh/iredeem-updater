@@ -1,15 +1,19 @@
 [
   [
+    "HKG",
+    "YYZ"
+  ],
+  [
+    "HKG",
+    "YVR"
+  ],
+  [
     "TPE",
     "NRT"
   ],
   [
     "TPE",
     "KIX"
-  ],
-  [
-    "TPE",
-    "NGO"
   ],
   [
     "TPE",
@@ -26,10 +30,6 @@
   [
     "HKG",
     "KIX"
-  ],
-  [
-    "HKG",
-    "NGO"
   ],
   [
     "HKG",

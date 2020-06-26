@@ -7,7 +7,10 @@
     "dotenv": "^8.2.0",
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.0",
-    "puppeteer": "^3.0.4",
+    "puppeteer": "^3.3.0",
+    "puppeteer-extra": "^3.1.9",
+    "puppeteer-extra-plugin-adblocker": "^2.11.3",
+    "puppeteer-extra-plugin-stealth": "^2.4.9",
     "rewire": "^5.0.0"
   },
   "devDependencies": {

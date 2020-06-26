@@ -1,6 +1,8 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
 import fetch from 'node-fetch';
 import fs from 'fs';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import AdblockerPlugin from 'puppeteer-extra-plugin-adblocker';
 
 let browser;
 let page;
@@ -10,6 +12,8 @@ let requestQuota;
 export async function initBrowserPage(retry = 5) {
   try {
     if (browser) await browser.close();
+    puppeteer.use(StealthPlugin());
+    puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
     browser = await puppeteer.launch({
       //executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
       headless: process.env.NODE_ENV != 'dev'
