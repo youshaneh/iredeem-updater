@@ -1,0 +1,18 @@
+CABIN
+ECO: economy, R (JL has E cabin, the status of which is usually "X". Not sure what that is)
+PEY: premium economy, N
+BUS: business, B
+FIR: first, F
+
+status
+N: not available
+L: waiting list
+X: (no such a cabin??)
+[1-9]+: available
+
+//treat KA as CX
+CX/KA[L] = L
+CX/KA[L] + CX/KA[L] = L
+CX/KA[L] + other[1-9] = N
+other[L] = N
+other[L] + other[L] = N
